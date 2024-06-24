@@ -1,0 +1,34 @@
+{
+	"configurations": 
+	[
+		{
+			"name": "Linux",
+			"includePath": 
+			[
+				"${workspaceFolder}/..",
+				"${workspaceFolder}/../external/cpp/inc"
+			],
+			"defines": [],
+			"cStandard": "gnu17",
+			"cppStandard": "gnu++17",
+			"intelliSenseMode": "gcc-x64",
+			"compilerPath": "/usr/bin/gcc"
+		},
+		{
+			"name": "Win32",
+			"includePath":
+			[
+				"${workspaceFolder}/..",
+				"${workspaceFolder}/../external/cpp/inc"
+			],
+			"defines":
+			[
+				"NOMINMAX",
+				"_USE_MATH_DEFINES"
+			],
+			"cppStandard": "c++20",
+			"intelliSenseMode": "windows-msvc-x64"
+		}
+	],
+	"version": 4
+}

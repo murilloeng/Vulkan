@@ -1,0 +1,50 @@
+{
+	"version": "2.0.0",
+	"tasks":
+	[
+		{
+			"args": [],
+			"type": "shell",
+			"label": "make",
+			"group": "build",
+			"linux" : 
+			{
+				"command": "make ${input:make}"
+			},
+			"windows" : 
+			{
+				"command": "msbuild ${input:msbuild}"
+			},
+			"presentation": 
+			{
+				"echo": false,
+				"clear": true,
+				"focus": true,
+				"panel": "dedicated",
+				"showReuseMessage": false,
+			}
+		}
+	],
+	"inputs": [
+		{
+			"id": "make",
+			"default": "run m=r",
+			"type": "promptString",
+			"description": "Make:"
+		},
+		{
+			"id": "msbuild",
+			"type": "pickString",
+			"description": "MSBuild:",
+			"options": 
+			[
+				"/property:Configuration=Debug", 
+				"/property:Configuration=Release", 
+				"/property:Configuration=Debug /target:Clean", 
+				"/property:Configuration=Release /target:Clean", 
+				"/property:Configuration=Debug; dist/x64/Debug/Tensegrity.exe", 
+				"/property:Configuration=Release; dist/x64/Release/Tensegrity.exe"
+			]
+		}
+	]
+}
