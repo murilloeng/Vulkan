@@ -42,8 +42,8 @@
 				"/property:Configuration=Release", 
 				"/property:Configuration=Debug /target:Clean", 
 				"/property:Configuration=Release /target:Clean", 
-				"/property:Configuration=Debug; dist/x64/Debug/Tensegrity.exe", 
-				"/property:Configuration=Release; dist/x64/Release/Tensegrity.exe"
+				"/property:Configuration=Debug; dist/x64/Debug/Vulkan.exe", 
+				"/property:Configuration=Release; dist/x64/Release/Vulkan.exe"
 			]
 		}
 	]
