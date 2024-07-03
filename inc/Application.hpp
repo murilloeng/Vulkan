@@ -19,12 +19,13 @@ const std::vector<const char*> device_extensions =
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-struct QueueFamilyIndices
+struct queue_family_indices
 {
+	//data
 	std::optional<uint32_t> present_family;
 	std::optional<uint32_t> graphics_family;
-
-	bool isComplete(void)
+	//check
+	bool check_family_indexes(void)
 	{
 		return graphics_family.has_value() && present_family.has_value();
 	}
@@ -78,7 +79,7 @@ private:
 	SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice);
 
 	static std::vector<char> read_file(const std::string&);
-	QueueFamilyIndices find_queue_families(VkPhysicalDevice);
+	queue_family_indices find_queue_families(VkPhysicalDevice);
 	static std::vector<const char*> get_required_extensions(void);
 	VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR&);
 	static VkPresentModeKHR choose_swap_present_mode(const std::vector<VkPresentModeKHR>&);

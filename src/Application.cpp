@@ -165,7 +165,7 @@ void Application::create_physical_device(void)
 
 void Application::create_logical_device(void)
 {
-	QueueFamilyIndices indices = find_queue_families(m_physical_device);
+	queue_family_indices indices = find_queue_families(m_physical_device);
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = {indices.graphics_family.value(), indices.present_family.value()};
@@ -227,7 +227,7 @@ void Application::create_swap_chain(void)
 	createInfo.imageArrayLayers = 1;
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-	QueueFamilyIndices indices = find_queue_families(m_physical_device);
+	queue_family_indices indices = find_queue_families(m_physical_device);
 	uint32_t queueFamilyIndices[] = {indices.graphics_family.value(), indices.present_family.value()};
 
 	if (indices.graphics_family != indices.present_family) {
@@ -328,8 +328,8 @@ void Application::create_render_pass(void)
 
 void Application::create_graphics_pipeline(void)
 {
-	auto vertShaderCode = read_file("shd/vert.spv");
-	auto fragShaderCode = read_file("shd/frag.spv");
+	auto vertShaderCode = read_file("shd/base_vert.spv");
+	auto fragShaderCode = read_file("shd/base_frag.spv");
 
 	VkShaderModule vertShaderModule = create_shader_module(vertShaderCode);
 	VkShaderModule fragShaderModule = create_shader_module(fragShaderCode);
@@ -461,7 +461,7 @@ void Application::create_framebuffers(void)
 
 void Application::create_command_pool()
 {
-	QueueFamilyIndices queueFamilyIndices = find_queue_families(m_physical_device);
+	queue_family_indices queueFamilyIndices = find_queue_families(m_physical_device);
 
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -680,39 +680,42 @@ SwapChainSupportDetails Application::query_swap_chain_support(VkPhysicalDevice d
 
 bool Application::check_device_features(VkPhysicalDevice device)
 {
-	QueueFamilyIndices indices = find_queue_families(device);
-
-	bool extensionsSupported = check_device_extension_support(device);
-
-	bool swapChainAdequate = false;
-	if (extensionsSupported) {
-		SwapChainSupportDetails swapChainSupport = query_swap_chain_support(device);
-		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.present_modes.empty();
+	//data
+	bool swap_chain_adequate = false;
+	queue_family_indices indices = find_queue_families(device);
+	bool extensions_supported = check_device_extension_support(device);
+	//check
+	if(extensions_supported)
+	{
+		SwapChainSupportDetails swap_chain_support = query_swap_chain_support(device);
+		swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
 	}
-
-	return indices.isComplete() && extensionsSupported && swapChainAdequate;
+	//return
+	return indices.check_family_indexes() && extensions_supported && swap_chain_adequate;
 }
 
 bool Application::check_device_extension_support(VkPhysicalDevice device)
 {
-	uint32_t extensionCount;
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, nullptr);
+	//count
+	uint32_t extension_count;
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
+	//extensions
+	std::vector<VkExtensionProperties> available_extensions(extension_count);
+	vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, available_extensions.data());
 
-	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
-	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
-
-	std::set<std::string> requiredExtensions(device_extensions.begin(), device_extensions.end());
-
-	for (const auto& extension : availableExtensions) {
-		requiredExtensions.erase(extension.extensionName);
+	std::set<std::string> required_extensions(device_extensions.begin(), device_extensions.end());
+	//erase
+	for(const VkExtensionProperties& extension : available_extensions)
+	{
+		required_extensions.erase(extension.extensionName);
 	}
-
-	return requiredExtensions.empty();
+	//return
+	return required_extensions.empty();
 }
 
-QueueFamilyIndices Application::find_queue_families(VkPhysicalDevice device)
+queue_family_indices Application::find_queue_families(VkPhysicalDevice device)
 {
-	QueueFamilyIndices indices;
+	queue_family_indices indices;
 
 	uint32_t queueFamilyCount = 0;
 	vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -733,7 +736,7 @@ QueueFamilyIndices Application::find_queue_families(VkPhysicalDevice device)
 			indices.present_family = i;
 		}
 
-		if (indices.isComplete()) {
+		if (indices.check_family_indexes()) {
 			break;
 		}
 
@@ -745,9 +748,8 @@ QueueFamilyIndices Application::find_queue_families(VkPhysicalDevice device)
 
 std::vector<const char*> Application::get_required_extensions(void)
 {
-	const char** glfw_extensions;
 	uint32_t glfw_extension_count = 0;
-	glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+	const char** glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
 	return std::vector<const char*>(glfw_extensions, glfw_extensions + glfw_extension_count);
 }
 

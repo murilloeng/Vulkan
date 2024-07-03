@@ -21,7 +21,13 @@ out = dist/$(mode)/vulkan.out
 #sources
 src := $(sort $(shell find -path './src/*.cpp'))
 
+#shaders
+vert := $(sort $(shell find -path './shd/*.vert'))
+frag := $(sort $(shell find -path './shd/*.frag'))
+
 #objects
+obj_vert := $(sort $(addsuffix .spv, $(basename $(vert))_vert))
+obj_frag := $(sort $(addsuffix .spv, $(basename $(frag))_frag))
 obj := $(sort $(subst ./src/, build/$(mode)/, $(addsuffix .o, $(basename $(src)))))
 
 #dependencies
@@ -37,19 +43,25 @@ run : $(out)
 debug : 
 	@gdb $(out) -x gdb.txt
 
-math :
-	@cd ../Math && make -f Makefile m=$m
-
-canvas :
-	@cd ../Canvas && make -f Makefile m=$m
-
-$(out) : math canvas $(obj)
-	@echo 'executable($(mode)): $@'
+$(out) : $(obj_vert) $(obj_frag) $(obj)
+	@echo 'executable - $(mode): $@'
 	@mkdir -p $(dir $@) && rm -rf $@
-	@$(CXX) -fopenmp -o $(out) $(obj) ../Math/dist/$(mode)/libmath.so ../Canvas/dist/$(mode)/libcanvas.so $(LIBS)
+	@$(CXX) -fopenmp -o $(out) $(obj) $(LIBS)
+
+shd/%_vert.spv : shd/%.vert
+	@echo 'compiling - $(mode): $<'
+	@glslc $< -o $@
+
+shd/%_frag.spv : shd/%.frag
+	@echo 'compiling - $(mode): $<'
+	@glslc $< -o $@
+
+shd/%_geom.spv : shd/%.geom
+	@echo 'compiling - $(mode): $<'
+	@glslc $< -o $@
 
 build/$(mode)/%.o : src/%.cpp build/$(mode)/%.d
-	@echo 'compiling($(mode)): $<'
+	@echo 'compiling - $(mode): $<'
 	@mkdir -p $(dir $@) && rm -rf $@
 	@$(CXX) $(CXXFLAGS) -c $< -o $@
 
