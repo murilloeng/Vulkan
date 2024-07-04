@@ -3,9 +3,8 @@
 
 int main(void)
 {
-	//data
-	Application app;
 	//application
+	Application app;
 	try { app.run(); }
 	catch (const std::exception& exception) 
 	{
