@@ -19,7 +19,8 @@
 			"includePath":
 			[
 				"${workspaceFolder}/..",
-				"${workspaceFolder}/../external/cpp/inc"
+				"${workspaceFolder}/../external/cpp/inc",
+				"C:/VulkanSDK/1.3.283.0/Include"
 			],
 			"defines":
 			[

@@ -22,20 +22,20 @@ const std::vector<const char*> device_extensions =
 struct queue_family_indices
 {
 	//data
-	std::optional<uint32_t> present_family;
-	std::optional<uint32_t> graphics_family;
+	std::optional<uint32_t> m_family_present;
+	std::optional<uint32_t> m_family_graphics;
 	//check
 	bool check_family_indexes(void)
 	{
-		return graphics_family.has_value() && present_family.has_value();
+		return m_family_graphics.has_value() && m_family_present.has_value();
 	}
 };
 
-struct SwapChainSupportDetails
+struct swap_chain_support_details
 {
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> present_modes;
+	VkSurfaceCapabilitiesKHR m_capabilities;
+	std::vector<VkSurfaceFormatKHR> m_formats;
+	std::vector<VkPresentModeKHR> m_present_modes;
 };
 
 class Application
@@ -76,7 +76,7 @@ private:
 	//physical device
 	bool check_device_features(VkPhysicalDevice);
 	bool check_device_extension_support(VkPhysicalDevice);
-	SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice);
+	swap_chain_support_details query_swap_chain_support(VkPhysicalDevice);
 
 	static std::vector<char> read_file(const std::string&);
 	queue_family_indices find_queue_families(VkPhysicalDevice);

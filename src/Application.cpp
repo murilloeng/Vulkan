@@ -168,7 +168,7 @@ void Application::create_logical_device(void)
 	queue_family_indices indices = find_queue_families(m_physical_device);
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-	std::set<uint32_t> uniqueQueueFamilies = {indices.graphics_family.value(), indices.present_family.value()};
+	std::set<uint32_t> uniqueQueueFamilies = {indices.m_family_graphics.value(), indices.m_family_present.value()};
 
 	float queuePriority = 1.0f;
 	for (uint32_t queueFamily : uniqueQueueFamilies) {
@@ -199,21 +199,21 @@ void Application::create_logical_device(void)
 		throw std::runtime_error("failed to create logical device!");
 	}
 
-	vkGetDeviceQueue(m_device, indices.graphics_family.value(), 0, &graphics_queue);
-	vkGetDeviceQueue(m_device, indices.present_family.value(), 0, &present_queue);
+	vkGetDeviceQueue(m_device, indices.m_family_graphics.value(), 0, &graphics_queue);
+	vkGetDeviceQueue(m_device, indices.m_family_present.value(), 0, &present_queue);
 }
 
 void Application::create_swap_chain(void)
 {
-	SwapChainSupportDetails swapChainSupport = query_swap_chain_support(m_physical_device);
+	swap_chain_support_details swapChainSupport = query_swap_chain_support(m_physical_device);
 
-	VkSurfaceFormatKHR surfaceFormat = choose_swap_surface_format(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = choose_swap_present_mode(swapChainSupport.present_modes);
-	VkExtent2D extent = choose_swap_extent(swapChainSupport.capabilities);
+	VkSurfaceFormatKHR surfaceFormat = choose_swap_surface_format(swapChainSupport.m_formats);
+	VkPresentModeKHR presentMode = choose_swap_present_mode(swapChainSupport.m_present_modes);
+	VkExtent2D extent = choose_swap_extent(swapChainSupport.m_capabilities);
 
-	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-	if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
-		imageCount = swapChainSupport.capabilities.maxImageCount;
+	uint32_t imageCount = swapChainSupport.m_capabilities.minImageCount + 1;
+	if (swapChainSupport.m_capabilities.maxImageCount > 0 && imageCount > swapChainSupport.m_capabilities.maxImageCount) {
+		imageCount = swapChainSupport.m_capabilities.maxImageCount;
 	}
 
 	VkSwapchainCreateInfoKHR createInfo{};
@@ -228,9 +228,9 @@ void Application::create_swap_chain(void)
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
 	queue_family_indices indices = find_queue_families(m_physical_device);
-	uint32_t queueFamilyIndices[] = {indices.graphics_family.value(), indices.present_family.value()};
+	uint32_t queueFamilyIndices[] = {indices.m_family_graphics.value(), indices.m_family_present.value()};
 
-	if (indices.graphics_family != indices.present_family) {
+	if (indices.m_family_graphics != indices.m_family_present) {
 		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 		createInfo.queueFamilyIndexCount = 2;
 		createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -238,7 +238,7 @@ void Application::create_swap_chain(void)
 		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
 	}
 
-	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+	createInfo.preTransform = swapChainSupport.m_capabilities.currentTransform;
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
@@ -466,7 +466,7 @@ void Application::create_command_pool()
 	VkCommandPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
 	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-	poolInfo.queueFamilyIndex = queueFamilyIndices.graphics_family.value();
+	poolInfo.queueFamilyIndex = queueFamilyIndices.m_family_graphics.value();
 
 	if (vkCreateCommandPool(m_device, &poolInfo, nullptr, &m_command_pool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create command pool!");
@@ -653,26 +653,26 @@ VkExtent2D Application::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capab
 	}
 }
 
-SwapChainSupportDetails Application::query_swap_chain_support(VkPhysicalDevice device)
+swap_chain_support_details Application::query_swap_chain_support(VkPhysicalDevice device)
 {
-	SwapChainSupportDetails details;
+	swap_chain_support_details details;
 
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.capabilities);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_surface, &details.m_capabilities);
 
 	uint32_t formatCount;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, nullptr);
 
 	if (formatCount != 0) {
-		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.formats.data());
+		details.m_formats.resize(formatCount);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_surface, &formatCount, details.m_formats.data());
 	}
 
 	uint32_t presentModeCount;
 	vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, nullptr);
 
 	if (presentModeCount != 0) {
-		details.present_modes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.present_modes.data());
+		details.m_present_modes.resize(presentModeCount);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_surface, &presentModeCount, details.m_present_modes.data());
 	}
 
 	return details;
@@ -687,8 +687,8 @@ bool Application::check_device_features(VkPhysicalDevice device)
 	//check
 	if(extensions_supported)
 	{
-		SwapChainSupportDetails swap_chain_support = query_swap_chain_support(device);
-		swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
+		swap_chain_support_details swap_chain_support = query_swap_chain_support(device);
+		swap_chain_adequate = !swap_chain_support.m_formats.empty() && !swap_chain_support.m_present_modes.empty();
 	}
 	//return
 	return indices.check_family_indexes() && extensions_supported && swap_chain_adequate;
@@ -726,14 +726,14 @@ queue_family_indices Application::find_queue_families(VkPhysicalDevice device)
 	int i = 0;
 	for (const auto& queueFamily : queueFamilies) {
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
-			indices.graphics_family = i;
+			indices.m_family_graphics = i;
 		}
 
 		VkBool32 presentSupport = false;
 		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_surface, &presentSupport);
 
 		if (presentSupport) {
-			indices.present_family = i;
+			indices.m_family_present = i;
 		}
 
 		if (indices.check_family_indexes()) {
