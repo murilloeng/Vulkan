@@ -23,7 +23,7 @@
 			]
 		},
 		{
-			"name": "VS",
+			"name": "msvc",
 			"type": "cppvsdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/dist/x64/Debug/Vulkan.exe",
@@ -31,7 +31,7 @@
 			"environment": [],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",
-			"console": "externalTerminal"
+			"console": "integratedTerminal"
 		}
 	]
 }
