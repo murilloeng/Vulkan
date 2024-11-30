@@ -1,19 +1,22 @@
 //std
+#include <cstdio>
 #include <cstdlib>
+#include <stdexcept>
 
 //vulkan
-#include "Vulkan/inc/Application.hpp"
+#include "Vulkan/inc/Window.hpp"
 
 int main(void)
 {
-	//application
-	// Application app;
-	// try { app.run(); }
-	// catch (const std::exception& exception) 
-	// {
-	// 	fprintf(stderr, "%s\n", exception.what());
-	// 	return EXIT_FAILURE;
-	// }
+	//data
+	Window window;
+	//start
+	try{ window.start(); }
+	catch(const std::exception& e)
+	{
+		printf("%s\n", e.what());
+		return EXIT_FAILURE;
+	}
 	//retun
 	return EXIT_SUCCESS;
 }
