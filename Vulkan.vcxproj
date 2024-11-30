@@ -19,16 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\Device.hpp" />
-    <ClInclude Include="inc\Pipeline.hpp" />
-    <ClInclude Include="inc\AppGalea.hpp" />
     <ClInclude Include="inc\Application.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Device.cpp" />
-    <ClCompile Include="src\Pipeline.cpp" />
-    <ClCompile Include="src\AppGalea.cpp" />
     <ClCompile Include="src\Application.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
